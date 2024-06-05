@@ -7,21 +7,45 @@ const postSchema = new mongoose.Schema({
     },
     mediaPath: {
         type: String,
-        required: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
-    likes: {
-        type: Map,
-        of: Boolean
+    //0 none 1 like 2 love 3 haha 4 angry 5 sad
+    likes:
+        {
+            type: Map,
+            of: Number
+        }
+    ,
+    likesCount: {
+        type: [Number],
+        default: []
     },
-    comments:{
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: "Comment"
-    },shares:{
-
+    reactionCount:{
+        type: Number,
+        default: 6
+    },
+    comments: {
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Comment"
+        }],
+        default: []
+    }
+    , shares: {
+        type: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ],
+        default: []
+    },
+    deleted: {
+        type: Boolean,
+        default: false
     }
 });
 

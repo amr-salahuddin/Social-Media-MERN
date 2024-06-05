@@ -3,6 +3,12 @@ const jwt = require("jsonwebtoken");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
+exports.adminOnly = catchAsync(async (req, res, next) => {
+    if(req.user.role !== 'admin'){
+        return next(new AppError("You are not authorized to perform this action", 401));
+    }
+    next();
+})
 exports.protect = catchAsync(async (req, res, next) => {
     let token;
 
