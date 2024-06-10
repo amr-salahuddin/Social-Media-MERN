@@ -6,9 +6,9 @@ const mongoose = require("mongoose");
 
 
 exports.post = catchAsync(async (req, res, next) => {
-    const {description} = req.body;
+    const {content} = req.body;
     const post = await Post.create({
-        description,
+        content,
         user: req.user.id
     });
     req.user.posts.push(post);
@@ -69,12 +69,13 @@ exports.getPost = catchAsync(async (req, res, next) => {
         },
         {
             $project: {
-                description: 1,
+                content: 1,
                 mediaPath: 1,
                 user: 1,
+                likesCount: 1,
+                reachCount: 1,
 
                 commentsCount: {$size: "$comments"},
-                likesCount: {$size: "$likes"}
             }
         }
     ]);
@@ -104,11 +105,17 @@ exports.getPostLikers = catchAsync(async (req, res, next) => {
             },
             {
                 $project: {
-                    likes: 1
+                    likes: 1,
+                    likesCount: 1,
+                    reactionsCount: 1
                 }
             }
         ]
     )
+    await Post.populate(post, {
+        path: "likes",
+        select: "firstName lastName picture"
+    })
     if (!post) {
         return next(new AppError("Post not found", 404));
     }
@@ -116,7 +123,6 @@ exports.getPostLikers = catchAsync(async (req, res, next) => {
         message: "OK",
         data: {
             likers: post.likes,
-            likersCount: post.likes.length
         }
     });
 })
@@ -127,12 +133,11 @@ exports.likePost = catchAsync(async (req, res, next) => {
 
     const postId = req.params.id;
     const post = await Post.findById(postId);
-
     if (!post) {
         return next(new AppError("Post not found", 404));
     }
-    const currentReaction = post.likes[user.id];
-
+    console.log(post);
+    const currentReaction = post.likes.get(user.id) || 0;
     if (currentReaction === reaction) {
         res.status(201).json({
             message: "Same Reaction",
@@ -143,14 +148,14 @@ exports.likePost = catchAsync(async (req, res, next) => {
         })
     }
     if (currentReaction != 0)
-        post.likesCount[currentReaction] = post.likesCount[currentReaction] - 1;
+        post.likesCount[currentReaction]--;
 
     if (reaction != 0)
-        post.likesCount[reaction] = post.likesCount[reaction] + 1;
+        post.likesCount[reaction]++;
     if (currentReaction == 0 && reaction != 0) {
-        post.likesCount[post.reactionCount]++;
+        post.likesCount[post.reactionsCount]++;
     }
-    post.likes[user.id] = reaction;
+    post.likes.set(user.id, reaction);
     await post.save();
     res.status(201).json({
         message: "Post liked",
@@ -159,4 +164,20 @@ exports.likePost = catchAsync(async (req, res, next) => {
             post
         }
     });
+})
+
+exports.commentPost = catchAsync(async (req, res, next) => {
+    const user = req.user;
+    const postId = req.params.id;
+    const comment = req.body.comment;
+
+    //check if post exists and not deleted using aggregate
+    const post = await Post.aggregate({
+
+
+    })
+    if (!post) {
+        return next(new AppError("Post not found", 404));
+    }
+
 })

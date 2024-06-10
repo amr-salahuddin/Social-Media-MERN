@@ -1,13 +1,16 @@
-const User = require("../models/user");
+const userService = require("../services/user-service");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
-
+const User = require("../models/user");
 exports.getUser = catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-        return new AppError("User not found", 404);
+    const id = req.params.id;
+    const exists = await userService.checkUserExist(id);
+    console.log(exists);
+    if (!exists) {
+        return next(new AppError("User not found", 404));
     }
+    const user = await userService.getUser(id);
     res.status(201).json({
         message: "OK",
         data: {user}
@@ -16,12 +19,19 @@ exports.getUser = catchAsync(async (req, res, next) => {
 
 exports.getFriends = catchAsync(async (req, res, next) => {
     const id = req.params.id;
-    const user = await User.findById(id).populate("friends", "firstName lastName picture");
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    const exists = await userService.checkUserExist(id);
+    if (!exists) {
+        return next(new AppError("User not found", 404));
+    }
+
+    const friends = await userService.getFriends(id, page, limit);
     //only get id firstName, lastName and picture
 
     res.status(201).json({
         message: "OK",
-        data: {friends: user.friends}
+        data: {friends: friends}
     });
 })
 

@@ -58,6 +58,15 @@ const userSchema = new mongoose.Schema({
         ],
         default: []
     },
+    likedComments: {
+        type: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Comment"
+            }
+        ],
+        default: []
+    },
     comments: {
         type: [
             {
@@ -90,6 +99,15 @@ const userSchema = new mongoose.Schema({
         default: []
 
     },
+    savedPosts: {
+        type: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Post"
+            }
+        ],
+        default: []
+    },
     location: String,
     occupation: String,
     viewedProfile: Number,
@@ -98,6 +116,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["user", "admin"],
         default: "user"
+    },
+    deleted: {
+        type: Boolean,
+        default: false
     }
 });
 
