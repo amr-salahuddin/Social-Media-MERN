@@ -48,7 +48,7 @@ class UserService {
     }
 
     async getUserPosts(id, page, limit) {
-        const user = await  User.findById(id).populate({
+        const user = await User.findById(id).populate({
             path: "posts",
             select: "content media",
             options: {
@@ -60,7 +60,7 @@ class UserService {
     }
 
     async getLikedPosts(id, page, limit) {
-        const user = await  User.findById(id).populate({
+        const user = await User.findById(id).populate({
             path: "likedPosts",
             select: "content media",
             options: {
@@ -72,7 +72,7 @@ class UserService {
     }
 
     async getSavedPosts(id, page, limit) {
-        const user = await  User.findById(id).populate({
+        const user = await User.findById(id).populate({
             path: "savedPosts",
             select: "content media",
             options: {
@@ -84,7 +84,7 @@ class UserService {
     }
 
     async getComments(id, page, limit) {
-        const user = await  User.findById(id).populate({
+        const user = await User.findById(id).populate({
             path: "comments",
             select: "content media",
             options: {
@@ -96,7 +96,7 @@ class UserService {
     }
 
     async getLikedComments(id, page, limit) {
-        const user = await  User.findById(id).populate({
+        const user = await User.findById(id).populate({
             path: "likedComments",
             select: "content media",
             options: {
@@ -107,6 +107,34 @@ class UserService {
         return user.likedComments;
     }
 
+    async removeFriend(user, friendId) {
+        user.friends = user.friends.filter((friend) => friend.toString() !== friendId);
+        await user.save();
+    }
+
+    async removeFriendRequest(user, friendId) {
+        user.friendRequests = user.friendRequests.filter((friend) => friend.toString() !== friendId);
+        await user.save();
+    }
+
+    async sendFriendRequest(user, friend) {
+        if (friend.friendRequests.includes(user.id)) {
+            await this.removeFriendRequest(friend, user.id);
+            user.friends.push(friend.id);
+            friend.friends.push(user.id);
+            await user.save();
+            await friend.save();
+            return 1;
+
+        }
+        else {
+            user.friendRequests.push(friend.id);
+            await user.save();
+            return 0;
+        }
+
+    }
 }
+
 
 module.exports = new UserService()

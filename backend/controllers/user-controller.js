@@ -37,18 +37,17 @@ exports.getFriends = catchAsync(async (req, res, next) => {
 
 exports.removeFriend = catchAsync(async (req, res, next) => {
     const user = req.user;
-    if (user.id === req.params.id) {
+    const friendId = req.params.id;
+    if (user.id === friendId) {
         return next(new AppError('You cannot remove yourself as a friend', 400));
     }
-    const friendToRemove = await User.findById(req.params.id);
-
-    user.friendRequests = user.friendRequests.filter((friend) => friend.toString() !== req.params.id);
-    user.friends = user.friends.filter((friend) => friend.toString() !== req.params.id);
-    friendToRemove.friends = friendToRemove.friends.filter((friend) => friend.toString() !== user.id);
-    friendToRemove.friendRequests = friendToRemove.friendRequests.filter((friend) => friend.toString() !== user.id);
-
-    await user.save();
-    await friendToRemove.save();
+    const friendExists = await userService.checkUserExist(friendId);
+    if (!friendExists) {
+        return next(new AppError('Friend not found', 404));
+    }
+    const friendToRemove = await userService.getUser(friendId);
+    await userService.removeFriend(user, friendId);
+    await userService.removeFriend(friendToRemove, user.id);
     return res.status(201).json({
         message: "Friend Removed",
         code: "FRIEND_REMOVED",
@@ -58,32 +57,30 @@ exports.removeFriend = catchAsync(async (req, res, next) => {
 exports.friendRequest = catchAsync(async (req, res, next) => {
 
     const user = req.user;
-    if (user.id === req.params.id) {
+    const friendId = req.params.id;
+    if (user.id === friendId) {
         return next(new AppError('You cannot send a friend request to yourself', 400));
     }
-    if (user.friendRequests.includes(req.params.id)) {
+    if (user.friendRequests.includes(friendId)) {
         return next(new AppError('You already sent a friend request', 400));
+    }
+    if (user.friends.includes(friendId)) {
+        return next(new AppError('You are already friends', 400));
     }
     const friendToRequest = await User.findById(req.params.id);
 
     //Add Friend
-    if (friendToRequest.friendRequests.includes(user.id)) {
-        user.friends.push(req.params.id);
-        friendToRequest.friends.push(user.id);
-        friendToRequest.friendRequests = friendToRequest.friendRequests.filter((friend) => friend.toString() !== user.id);
-        await user.save();
-        await friendToRequest.save();
+    const friendRequest = await userService.sendFriendRequest(user, friendToRequest);
+    if (friendRequest == 0) {
+        return res.status(201).json({
+            message: "Friend Request Sent",
+            code: 'FRIEND_REQUEST_SENT',
+            data: {user}
+        })
+    } else
         return res.status(201).json({
             message: "Friend Added",
             code: 'FRIEND_ADDED',
             data: {user}
         });
-    }
-    user.friendRequests.push(req.params.id);
-    await user.save();
-    return res.status(201).json({
-        message: "Friend Request Sent",
-        code: 'FRIEND_REQUEST_SENT',
-        data: {user}
-    });
 })
