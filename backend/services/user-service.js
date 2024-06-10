@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const mongoose = require("mongoose");
-
+const {tokenize,decode} = require('../utils/tokenization')
 class UserService {
 
     async getUser(id) {
@@ -16,7 +16,27 @@ class UserService {
         return !(!user || user.deleted);
 
     }
+    async checkUserExistsByEmail(email) {
+        const user = await User.findOne({email});
+        return !(!user || user.deleted);
+    }
 
+    async register(userInfo) {
+
+        const user = await User.create(userInfo);
+        return user;
+
+    }
+    async login(email,password){
+
+        const user = await User.findOne({email});
+        if(!user || !await user.matchPassword(password)){
+            return null;
+        }
+
+        const token = tokenize({id: user._id});
+        return {token,user};
+    }
     async getFriends(id, page, limit) {
 
         const user = await User.findById(id).populate({
