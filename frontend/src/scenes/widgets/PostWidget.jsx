@@ -1,47 +1,50 @@
-import React from 'react';
-import {Box, Typography, Avatar, IconButton, Divider} from '@mui/material';
-import {MoreHoriz, Favorite, Comment, Share} from '@mui/icons-material';
+import React, {useState} from 'react';
+import {Box, Typography, Avatar, IconButton, Divider, Menu, MenuItem} from '@mui/material';
+import {MoreHoriz, Favorite, Comment, Share,} from '@mui/icons-material';
 import {WidgetWrapper} from '../../components/WidgetWrapper';
 import dayjs from 'dayjs';
+import Media from "../../components/Media/Media";
+import {deletePostAPI} from "../../apiRequests";
+import {useDispatch, useSelector} from "react-redux";
+import {deletePost} from "../../state";
 
 const PostWidget = ({post}) => {
+
+
+    const [optionsAnchorEl, setOptionsAnchorEl] = useState(null)
+    const isMenuOpen = Boolean(optionsAnchorEl);
+    const token = useSelector((state) => state.token);
+    let posts =useSelector((state)=>state.posts);
+
+    const dispatch = useDispatch();
+    function handleOptionsClick(event) {
+
+        setOptionsAnchorEl(event.currentTarget);
+    }
+
+    function handleOptionsClose() {
+        setOptionsAnchorEl(null);
+
+
+    }
+
+    async function handleMenuDeleteClick() {
+
+
+        const responseOk = await deletePostAPI(token, post._id)
+        if(responseOk){
+
+            dispatch(deletePost({ post: { _id: post._id } }));
+
+        }
+    }
 
     const user = post.user;
     const fullName = `${user.firstName} ${user.lastName}`;
     const formattedDate = dayjs(post.createdAt).format('DD/MM/YYYY HH:mm:ss');
-
-
-    const mediaBox = post.media.map((x)=>{
+    const mediaBox = post.media.map((x, index) => {
         const path = `${process.env.REACT_APP_BACKEND_BASE}/${x.path}`
-        console.log(x.mimetype.split('/')[0])
-        if(x.mimetype.split('/')[0] == 'image'){
-            return(
-                <Box
-                    component="img"
-                    src={path}
-
-                    alt="Post media"
-                    width="100%"
-                    borderRadius="0.5rem"
-                    mb={1}
-                />
-            )
-        }
-        else{
-            return(
-                <Box
-                    component="video"
-                    src={path}
-
-
-                    alt="Post media"
-                    width="100%"
-                    borderRadius="0.5rem"
-                    mb={1}
-                    onClick={(e)=> e.target.play()}
-                />
-            )
-        }
+        return <Media  key={index} file={x}/>
     })//use intl
     return (
         <WidgetWrapper mb={2}>
@@ -56,10 +59,23 @@ const PostWidget = ({post}) => {
                         </Typography>
                     </Box>
                 </Box>
-                <IconButton>
+                <IconButton onClick={handleOptionsClick}>
                     <MoreHoriz/>
                 </IconButton>
             </Box>
+
+            <Menu
+                anchorEl={optionsAnchorEl}
+                disableScrollLock
+                open={isMenuOpen}
+                onClose={handleOptionsClose}
+                anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+                transformOrigin={{vertical: 'top', horizontal: 'right'}}
+
+            >
+                <MenuItem onClick={handleOptionsClose}>Edit</MenuItem>
+                <MenuItem onClick={handleMenuDeleteClick}>Delet</MenuItem>
+            </Menu>
 
             {/* Description */}
             <Typography mb={1}>{post.description}</Typography>

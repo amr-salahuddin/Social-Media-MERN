@@ -3,26 +3,26 @@ import {Box, Avatar, TextField, Button, Typography, Divider, useTheme} from '@mu
 import {Image, VideoLibrary, AttachFile, Audiotrack} from '@mui/icons-material';
 import {WidgetWrapper} from "../../components/WidgetWrapper";
 import {FlexBetween} from "../../components/FlexBetween";
-import {useSelector} from "react-redux";
-
+import {useDispatch, useSelector} from "react-redux";
+import {addPost} from "../../state";
 const MediaPostWidget = () => {
     const theme = useTheme();
 
     const [showFile, setShowFile] = useState()
     const [selectedFile, setSelectedFile] = useState(null);
-
+    const [description, setDescription] = useState()
     function handleImageUpload(event) {
         const file = event.target.files[0];
         console.log(file, URL.createObjectURL(file));
         setShowFile(URL.createObjectURL(file));
         setSelectedFile(file);
     }
-
     const token = useSelector((state) => state.token);
-
+    const dispatch = useDispatch();
     const sendPost = async () => {
         const formData = new FormData();
         formData.append('file', selectedFile);
+        formData.append('description', description);
 
         const response = await fetch(`${process.env.REACT_APP_BACKEND}/post`, {
             method: 'POST',
@@ -34,7 +34,11 @@ const MediaPostWidget = () => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
+            dispatch(addPost({post: data.data.post}));
+
+            console.log(data.data.post)
+
+
         } else {
             console.log(response)
         }
@@ -43,6 +47,9 @@ const MediaPostWidget = () => {
 
     const handleSubmit = (event) => {
         sendPost()
+        setSelectedFile(null);
+        setShowFile(null);
+        setDescription(null);
     }
 
     return (
@@ -65,6 +72,8 @@ const MediaPostWidget = () => {
                     multiline
                     minRows={'1'}
                     maxRows={'8'}
+                    value={description}
+                    onChange={(event) => setDescription(event.target.value)}
                     sx={{
                         '& .MuiOutlinedInput-root': {
                             height: '100%',  // Ensure the input takes full height

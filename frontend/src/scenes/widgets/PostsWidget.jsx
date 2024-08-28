@@ -1,13 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import { Box } from '@mui/material';
 import PostWidget from './PostWidget';
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {setPosts} from "../../state";
 
 const PostsWidget = () => {
 
-    const [posts, setPosts] = useState(null)
+    const dispatch = useDispatch();
+    const posts = useSelector((state) => state.posts);
 
     const id = useSelector((state) => state.user._id)
+
 
     console.log(process.env.REACT_APP_BACKEND)
     const getPosts = async () => {
@@ -20,7 +23,9 @@ const PostsWidget = () => {
         })
         if(response.ok) {
             const data = await response.json();
-            setPosts(data.data.posts);
+
+            dispatch(setPosts({posts: data.data.posts}));
+            console.log(posts);
         }
         else{
             console.log(response)
@@ -31,6 +36,7 @@ const PostsWidget = () => {
         getPosts();
     },[])
     if(!posts) return null;
+    console.log(posts);
     return (
         <Box>
             {posts.map((post) => (
