@@ -1,0 +1,5 @@
+!/frontend/node_modules/
+!/frontend/package-lock.json
+!/frontend/.env
+!/frontend/public/
+/frontend/node_modules/
