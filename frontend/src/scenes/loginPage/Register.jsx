@@ -17,31 +17,61 @@ const Register = (props) => {
 
     const theme = useTheme();
     const handleSwitch = props.handleSwitch;
+    async function handleSubmit(values) {
+        const formData ={
+            firstName: values.firstName,
+            lastName: values.lastName,
+            username: values.username,
+            email: values.email,
+            password: values.password,
+            passwordConfirm: values.passwordConfirm
+        }
 
+        //output formdata values
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND}/auth/register`, {
+                method: 'POST',
+                body: JSON.stringify(formData),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                }
+            });
+            if(response.ok){
+                const data = await response.json();
+                handleSwitch();
+                console.log(data)
+            }
+            else{
+                console.log('error', response);
+            }
+
+        }catch (e){
+            console.log(e)
+        }
+
+    }
     const formik = useFormik({
         initialValues: {
             firstName: '',
             lastName: '',
-            location: '',
-            occupation: '',
+            username:'',
             email: '',
-            password: ''
+            password: '',
+            passwordConfirm: '',
         },
         validateOnChange: false,
-        validateOnBlur: false,
+        validateOnBlur: true,
 
         validationSchema: Yup.object({
             firstName: Yup.string().required('First Name is required'),
             lastName: Yup.string().required('Last Name is required'),
-            location: Yup.string().required('Location is required'),
-            occupation: Yup.string().required('Occupation is required'),
+            username: Yup.string().required('Username is required'),
             email: Yup.string().email('Invalid email address').required('Email is required'),
-            password: Yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
+            password: Yup.string().min(5, 'Password must be at least 5 characters').required('Password is required'),
+            passwordConfirm: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
         }),
-        onSubmit: values => {
-            console.log('Form data', values);
-            console.log('Selected file', selectedFile);
-        },
+        onSubmit: handleSubmit
     });
 
     return (
@@ -74,29 +104,59 @@ const Register = (props) => {
                     helperText={formik.touched.lastName && formik.errors.lastName}
                 />
             </FlexBetween>
+
+
             <TextField
                 margin="normal"
                 required
                 fullWidth
-                label="Location"
-                name="location"
-                value={formik.values.location}
+                label="Email Address"
+                name="email"
+                type="email"
+                value={formik.values.email}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                error={formik.touched.location && Boolean(formik.errors.location)}
-                helperText={formik.touched.location && formik.errors.location}
+                error={formik.touched.email && Boolean(formik.errors.email)}
+                helperText={formik.touched.email && formik.errors.email}
             />
             <TextField
                 margin="normal"
                 required
                 fullWidth
-                label="Occupation"
-                name="occupation"
-                value={formik.values.occupation}
+                label="Username"
+                name="username"
+                type="username"
+                value={formik.values.username}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                error={formik.touched.occupation && Boolean(formik.errors.occupation)}
-                helperText={formik.touched.occupation && formik.errors.occupation}
+                error={formik.touched.username && Boolean(formik.errors.username)}
+                helperText={formik.touched.username && formik.errors.username}
+            />
+            <TextField
+                margin="normal"
+                required
+                fullWidth
+                label="Password"
+                name="password"
+                type="password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.password && Boolean(formik.errors.password)}
+                helperText={formik.touched.password && formik.errors.password}
+            />
+            <TextField
+                margin="normal"
+                required
+                fullWidth
+                label="Password Confirmation"
+                name="passwordConfirm"
+                type="password"
+                value={formik.values.passwordConfirm}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.passwordConfirm && Boolean(formik.errors.password)}
+                helperText={formik.touched.passwordConfirm && formik.errors.passwordConfirm}
             />
             <Box p='1rem' border='1px solid grey'>
                 <Dropzone onDrop={handleDrop}>
@@ -120,32 +180,6 @@ const Register = (props) => {
                     )}
                 </Dropzone>
             </Box>
-            <TextField
-                margin="normal"
-                required
-                fullWidth
-                label="Email Address"
-                name="email"
-                type="email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.email && Boolean(formik.errors.email)}
-                helperText={formik.touched.email && formik.errors.email}
-            />
-            <TextField
-                margin="normal"
-                required
-                fullWidth
-                label="Password"
-                name="password"
-                type="password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.password && Boolean(formik.errors.password)}
-                helperText={formik.touched.password && formik.errors.password}
-            />
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                 Register
             </Button>

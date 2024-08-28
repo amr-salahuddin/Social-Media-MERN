@@ -1,24 +1,63 @@
 import React from 'react';
-import { Box, Typography, Avatar, IconButton, Divider } from '@mui/material';
-import { MoreHoriz, Favorite, Comment, Share } from '@mui/icons-material';
-import { WidgetWrapper } from '../../components/WidgetWrapper';
+import {Box, Typography, Avatar, IconButton, Divider} from '@mui/material';
+import {MoreHoriz, Favorite, Comment, Share} from '@mui/icons-material';
+import {WidgetWrapper} from '../../components/WidgetWrapper';
+import dayjs from 'dayjs';
 
-const PostWidget = ({ post }) => {
+const PostWidget = ({post}) => {
+
+    const user = post.user;
+    const fullName = `${user.firstName} ${user.lastName}`;
+    const formattedDate = dayjs(post.createdAt).format('DD/MM/YYYY HH:mm:ss');
+
+
+    const mediaBox = post.media.map((x)=>{
+        const path = `${process.env.REACT_APP_BACKEND_BASE}/${x.path}`
+        console.log(x.mimetype.split('/')[0])
+        if(x.mimetype.split('/')[0] == 'image'){
+            return(
+                <Box
+                    component="img"
+                    src={path}
+
+                    alt="Post media"
+                    width="100%"
+                    borderRadius="0.5rem"
+                    mb={1}
+                />
+            )
+        }
+        else{
+            return(
+                <Box
+                    component="video"
+                    src={path}
+
+
+                    alt="Post media"
+                    width="100%"
+                    borderRadius="0.5rem"
+                    mb={1}
+                    onClick={(e)=> e.target.play()}
+                />
+            )
+        }
+    })//use intl
     return (
         <WidgetWrapper mb={2}>
             {/* Header: Avatar, Name, Date, and More Options */}
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                 <Box display="flex" alignItems="center">
-                    <Avatar src={post.userAvatar} alt={post.userName} />
+                    <Avatar src={user.avatarUrl} alt={fullName}/>
                     <Box ml={2}>
-                        <Typography fontWeight="bold">{post.userName}</Typography>
+                        <Typography fontWeight="bold">{fullName}</Typography>
                         <Typography variant="body2" color="textSecondary">
-                            {post.date}
+                            {formattedDate}
                         </Typography>
                     </Box>
                 </Box>
                 <IconButton>
-                    <MoreHoriz />
+                    <MoreHoriz/>
                 </IconButton>
             </Box>
 
@@ -26,16 +65,7 @@ const PostWidget = ({ post }) => {
             <Typography mb={1}>{post.description}</Typography>
 
             {/* Media (Image/Video) */}
-            {post.mediaUrl && (
-                <Box
-                    component="img"
-                    src={post.mediaUrl}
-                    alt="Post media"
-                    width="100%"
-                    borderRadius="0.5rem"
-                    mb={1}
-                />
-            )}
+            {mediaBox}
 
             {/* Likes, Comments, Shares */}
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
@@ -43,26 +73,26 @@ const PostWidget = ({ post }) => {
                     {post.likes} Likes
                 </Typography>
                 <Typography variant="body2">
-                    {post.comments.length} Comments · {post.shares} Shares
+                    {post.comments.length} Comments · 0 Shares
                 </Typography>
             </Box>
 
-            <Divider />
+            <Divider/>
 
             {/* Like, Comment, Share Buttons */}
             <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
                 <IconButton>
-                    <Favorite />
+                    <Favorite/>
                 </IconButton>
                 <IconButton>
-                    <Comment />
+                    <Comment/>
                 </IconButton>
                 <IconButton>
-                    <Share />
+                    <Share/>
                 </IconButton>
             </Box>
 
-            <Divider />
+            <Divider/>
 
             {/* Comments Section */}
             <Box mt={1}>

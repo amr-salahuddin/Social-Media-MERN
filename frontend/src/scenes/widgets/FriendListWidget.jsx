@@ -1,9 +1,35 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Box, Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText, IconButton, Divider } from '@mui/material';
 import { Delete } from '@mui/icons-material';
-import { WidgetWrapper } from '../../components/WidgetWrapper'; // Assuming WidgetWrapper is in the same directory
+import { WidgetWrapper } from '../../components/WidgetWrapper';
+import {useSelector} from "react-redux"; // Assuming WidgetWrapper is in the same directory
 
-const FriendList = ({ friends, handleUnfriend }) => {
+const FriendList = ( handleUnfriend) => {
+
+    const id = useSelector((state) => state.user._id);
+    const [friends, setFriends] = useState(null)
+
+    const getFriends = async () => {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND}/user/friends/${id}`, {
+            method: 'GET',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            }
+            
+        })
+
+        if(response.ok){
+            const data = await response.json();
+            setFriends(data.data.friends);
+        }
+    }
+    useEffect(() => {
+        getFriends();
+    },[])
+
+    if(!friends)
+        return null;
+
     return (
         <WidgetWrapper>
             {/* Title */}
@@ -14,7 +40,7 @@ const FriendList = ({ friends, handleUnfriend }) => {
             {/* Friend List */}
             <List>
                 {friends.map((friend, index) => (
-                    <Box key={friend.id}>
+                    <Box key={friend._id}>
                         <ListItem alignItems="center">
                             {/* Avatar */}
                             <ListItemAvatar>
@@ -22,7 +48,7 @@ const FriendList = ({ friends, handleUnfriend }) => {
                             </ListItemAvatar>
                             {/* Name and Occupation */}
                             <ListItemText
-                                primary={friend.name}
+                                primary={friend.firstName + ' ' + friend.lastName}
                                 secondary={friend.occupation}
                             />
                             {/* Unfriend Button */}

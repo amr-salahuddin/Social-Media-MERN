@@ -2,7 +2,7 @@ import Navbar from "scenes/navbar"
 import ProfileWidget from "../widgets/ProfileWidget";
 import {FlexBetween} from "../../components/FlexBetween";
 import {Box} from "@mui/material";
-import NewPostWidget from "../widgets/NewPostWidget";
+import NewPostWidget from "../widgets/MediaPostWidget";
 import AdWidget from "../widgets/AdWidget";
 import FriendListWidget from "../widgets/FriendListWidget";
 import PostsWidget from "../widgets/PostsWidget";

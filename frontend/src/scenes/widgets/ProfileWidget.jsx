@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, Button, Typography, Divider, Avatar, useTheme} from '@mui/material';
 import {
     LocationOn,
@@ -10,17 +10,44 @@ import {
 } from '@mui/icons-material';
 import {WidgetWrapper} from "../../components/WidgetWrapper";
 import {FlexBetween} from "../../components/FlexBetween";
+import {useSelector} from "react-redux";
 
 const ProfileWidget = () => {
-    // Mock data
-    const name = "John Doe";
-    const numberOfFriends = 120;
-    const location = "New York, USA";
-    const occupation = "Software Engineer";
-    const profileViews = 350;
-    const postImpressions = 1500;
+
+    const [user, setUser] = useState(null)
+
     const {palette} = useTheme();
+
+    const token = useSelector((state) => state.token)
+    const getUser = async () => {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND}/auth/me`, {
+            method: 'GET',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${token}`
+
+            }
+
+        })
+        const data = await response.json()
+        setUser(data.data.user);
+    }
+    useEffect(() => {
+        getUser();
+    },[])
+    if(!user) return null
+    // Mock data
+
+    const name = `${user.firstName} ${user.lastName}`;
+    //get user.friends array length
+
+    const numberOfFriends = user.friends.length ||0;
+    const location = user.location || "Unknown";
+    const occupation = user.occupation|| "Unknown";
+    const profileViews = user.profileViews || 0;
+    const postImpressions = 1500;
     const medium = palette.neutral.medium;
+    const username = user.username;
 
     return (
         <WidgetWrapper>
@@ -54,10 +81,6 @@ const ProfileWidget = () => {
                 <Typography variant="body2" fontWeight="bold">Who's viewed your profile</Typography>
                 <Typography color={medium} variant="body2">{profileViews}</Typography>
             </Box>
-            <Box display="flex" justifyContent='space-between' alignItems="center" mb={2}>
-                <Typography variant="body2" fontWeight="bold">Number of impressions in your posts</Typography>
-                <Typography color={medium} variant="body2">{postImpressions}</Typography>
-            </Box>
 
 
             <Divider/>
@@ -70,7 +93,7 @@ const ProfileWidget = () => {
                         <Twitter sx={{mr: 1, fontSize: '1.5rem'}}/>
                         <Box>
                             <Typography fontWeight="bold">Twitter</Typography>
-                            <Typography color="textSecondary">johndoe</Typography>
+                            <Typography color="textSecondary">{username}</Typography>
                         </Box>
                     </FlexBetween>
                     {/* Modify Option */}
