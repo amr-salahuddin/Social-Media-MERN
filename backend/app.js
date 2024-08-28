@@ -2,13 +2,14 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
-const multer = require("multer");
-const authRoute = require("./Routes/auth-route");
-const userRoute = require("./Routes/user-route");
-const postRoute = require("./Routes/post-route");
 dotenv.config({ path: "./config.env" });
+const errorHandler= require("./controllers/error-controller");
+const userRoute = require('./routes/user-route');
+const authRoute = require('./routes/auth-route');
+const postRoute = require('./routes/post-route');
+const multer = require("multer");
 
-
+const uuidv4 = require('uuid').v4
 const app = express();
 
 if (process.env.NODE_ENV !== "production")
@@ -17,40 +18,31 @@ app.use(cors());
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, `public/assets/`);
+    },
+    filename: (req, file, cb) => {
+        cb(null, ` ${uuidv4()}-${file.originalname}`);
+    }
+
+});
+const upload = multer({storage});
+app.post('/api/v1/upload', upload.any('file'), (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'File uploaded successfully'
+    })
+})
 app.use('/public', express.static('public'));
 
-//region Routes
-app.use('/api/v1/auth/' , authRoute);
-app.use('/api/v1/user/' , userRoute);
-app.use('/api/v1/post/' , postRoute);
+//region routes
 
+app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/user', userRoute);
+app.use('/api/v1/post',postRoute)
+// app.use('/api/comment', require('./routes/comment-route'));
 
-/* FILE STORAGE */
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "public/assets");
-    },
-    filename: function (req, file, cb) {
-        console.log('hi');
-
-        cb(null, file.originalname);
-    },
-});
-const upload = multer({ storage });
-
-
-app.post ('/upload', upload.single('sad'), function (req, res, next){
-
-    const file = req.file;
-    res.send(file);
-}  );
 //endregion
-app.use((error, req, res, next) => {
-    const status = error.statusCode || 500;
-    const message = error.message;
-    res.status(status).json({
-        message
-    });
-});
-
+app.use(errorHandler)
 module.exports = app;

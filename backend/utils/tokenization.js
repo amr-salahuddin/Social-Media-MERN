@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const AppError = require("./appError");
 exports.tokenize = (payload)=>{
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -8,6 +9,13 @@ exports.tokenize = (payload)=>{
 }
 
 exports.decode = (token)=>{
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let decoded;
+    try {
+         decoded = jwt.verify(token, process.env.JWT_SECRET);
+    }
+    catch (e) {
+        throw new AppError('Invalid token', 401);
+
+    }
     return decoded;
 }

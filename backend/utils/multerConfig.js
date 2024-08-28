@@ -1,26 +1,27 @@
-/* FILE STORAGE */
-const {v4: uuidv4} = require("uuid");
 const multer = require("multer");
-const userStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "public/user_pictures");
-    },
-    filename: function (req, file, cb) {
-        const fileName = uuidv4() + file.originalname;
-        cb(null, fileName);
-    },
-});
-exports.uploadUserPicture = multer({storage :userStorage});
+const {v4: uuidv4} = require('uuid');
+const profilePictureStorage = (userId) => {
+    return multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, `public/profilePictures/${userId}`);
+        },
+        filename: (req, file, cb) => {
+            cb(null, ` ${userId}-${file.originalname}`);
+        }
 
-const postStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        console.log(__dirname)
-        cb(null, __dirname + "/public/assets");
+    })
+}
+
+module.exports = profilePictureStorage
+
+
+const postMediaStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, `public/post_media/`);
     },
-    filename: function (req, file, cb) {
-        // const fileName = uuidv4() + file.originalname;
-        console.log('hi');
-        cb(null, file.originalname);
-    },
-});
-exports.uploadPostMedia = multer({storage:postStorage});
+    filename: (req, file, cb) => {
+        cb(null, `${uuidv4()}-${file.originalname}`);
+    }
+})
+
+module.exports = multer({storage: postMediaStorage});
