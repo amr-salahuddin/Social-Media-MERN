@@ -58,7 +58,7 @@ function NewCommentWidget({theme,handleCommentSubmit}) {
                     endAdornment: (
                         <InputAdornment position="end">
                             <FileUploader fileUploadHandler={handleFileUpload} fileUploadRef={fileUploadRef}/>
-                            <IconButton onClick={() => fileUploadRef.current.click()}>
+                            <IconButton  onClick={() => fileUploadRef.current.click()}>
                                 <Attachment/>
                             </IconButton>
                             <IconButton onClick={handleSubmit}>

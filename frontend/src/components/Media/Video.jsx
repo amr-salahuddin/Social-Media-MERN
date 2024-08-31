@@ -2,7 +2,8 @@ import {Box} from "@mui/material";
 import React from "react";
 
 
-const Video = ({src, alt}) => {
+const Video = (props) => {
+    const {src, alt} = props
     return (
         <Box
             component="video"
@@ -10,6 +11,7 @@ const Video = ({src, alt}) => {
             controls
             alt={alt}
             width="100%"
+
             borderRadius="0.5rem"
             mb={1}
         />

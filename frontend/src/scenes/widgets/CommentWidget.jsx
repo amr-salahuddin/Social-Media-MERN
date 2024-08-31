@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import {MoreHoriz, MoreHorizSharp, MoreHorizTwoTone} from "@mui/icons-material";
 import {useSelector} from "react-redux";
 import Media from "../../components/Media/Media";
+import MediaGrid from "../../components/MediaGrid";
 
 
 function Comment({comment, handleCommentDelete, handleCommentEdit}) {
@@ -10,6 +11,7 @@ function Comment({comment, handleCommentDelete, handleCommentEdit}) {
     const isMenuOpen = Boolean(anchorEl);
     const id = useSelector((state) => state.user._id)
     const isMyComment = comment.user._id == id
+    const host =`${process.env.REACT_APP_BACKEND_BASE}`
 
     function handleMenuOpen(e) {
         setAnchorEl(e.currentTarget);
@@ -34,12 +36,10 @@ function Comment({comment, handleCommentDelete, handleCommentEdit}) {
                         <Typography variant="body2" color="textSecondary">
                             {comment.createdAt}
                         </Typography>
-                        <Typography fontWeight="bold" color="textSecondary">
-                            {comment.comment}
-                        </Typography>
-                    </Box>
 
+                    </Box>
                 </Box>
+
                 <Menu
                     anchorEl={anchorEl}
                     open={isMenuOpen}
@@ -56,7 +56,10 @@ function Comment({comment, handleCommentDelete, handleCommentEdit}) {
                     <MoreHorizSharp/>
                 </IconButton>
             </Box>
-                {comment.media && comment.media.map((x, index) => <Media  key={index} file={x}/>)}
+            <Typography fontWeight="bold" color="textSecondary">
+                {comment.comment}
+            </Typography>
+            <MediaGrid media={comment.media} host={host}/>
         </React.Fragment>
     )
 }

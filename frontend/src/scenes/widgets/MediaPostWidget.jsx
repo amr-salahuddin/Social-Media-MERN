@@ -5,30 +5,50 @@ import {WidgetWrapper} from "../../components/WidgetWrapper";
 import {useDispatch, useSelector} from "react-redux";
 import {addPost} from "../../state";
 import FileUploader from "../../components/FileUploader";
+import MediaGrid from "../../components/MediaGrid";
 
 const MediaPostWidget = () => {
     const theme = useTheme();
 
     const fileUploadRef = useRef()
-    const [showFile, setShowFile] = useState()
+    const [showFiles, setShowFiles] = useState()
     const [files, setFiles] = useState(null);
     const [description, setDescription] = useState()
+
     function handleImageUpload(event) {
-        const file = event.target.files[0];
-        console.log('blob',file, URL.createObjectURL(file));
-        setShowFile(URL.createObjectURL(file));
-        console.log('hi',event.target.files);
+        const tempShowFiles = [];
+        for (let i = 0; i < event.target.files.length; i++) {
+
+            const file = event.target.files[i];
+
+            console.log(file.path, 'sxs')
+            const path = URL.createObjectURL(file)
+            tempShowFiles.push(
+                {
+                    path,
+                    originalname: file.name,
+                    mimetype: file.type
+                }
+            );
+
+        }
+
+        setShowFiles(tempShowFiles);
+        console.log('xxx', tempShowFiles, showFiles)
         setFiles(event.target.files);
     }
+
     const token = useSelector((state) => state.token);
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
     const sendPost = async () => {
         const formData = new FormData();
         console.log(files)
-        for (let i = 0; i < files.length; i++) {
-            formData.append('file', files[i]); // Adjust 'file' key if multer expects something else
-        }        formData.append('description', description);
+        if (files)
+            for (let i = 0; i < files.length; i++) {
+                formData.append('file', files[i]); // Adjust 'file' key if multer expects something else
+            }
+        formData.append('description', description);
 
         const response = await fetch(`${process.env.REACT_APP_BACKEND}/post`, {
             method: 'POST',
@@ -58,7 +78,7 @@ const MediaPostWidget = () => {
     }
     const handleFilesCancel = () => {
         setFiles(null);
-        setShowFile(null);
+        setShowFiles(null);
     }
 
     return (
@@ -103,20 +123,8 @@ const MediaPostWidget = () => {
 
             </Box>
             <Divider sx={{mb: 2}}/>
-            {showFile && (
-                <Box mt={2}>
-                    <Typography variant="body2" mb={1}>Selected File:</Typography>
-                    <Button onClick={handleFilesCancel}>Remove</Button>
-                    <Box
-                        component="img"
-                        src={showFile}
-                        alt="Selected"
-                        width="100%"
-                        height="auto"
-                        maxHeight='300px'
-                        sx={{borderRadius: '0.75rem'}}
-                    />
-                </Box>
+            {showFiles && (
+                <MediaGrid media={showFiles}/>
             )}
 
             {/* Media Options */}

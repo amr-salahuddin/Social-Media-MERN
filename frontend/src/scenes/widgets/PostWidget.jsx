@@ -20,7 +20,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {deletePost, updatePost} from "../../state";
 import CommentWidget from "./CommentWidget";
 import NewCommentWidget from "./NewCommentWidget";
-import MediaGridViewer from "../../components/MediaGridViewer";
+import MediaGrid from "../../components/MediaGrid";
 
 const PostWidget = ({post}) => {
 
@@ -42,7 +42,7 @@ const PostWidget = ({post}) => {
     const [hasMoreComments, setHasMoreComments] = useState(true);
     //endregion
 
-
+    const host = `${process.env.REACT_APP_BACKEND_BASE}`
     useEffect(() => {
 
         setIsLiked(post.likes.some(like => like.user == id));
@@ -163,10 +163,10 @@ const PostWidget = ({post}) => {
             {/* Media (Image/Video) */}
 
 
-           <MediaGridViewer media={post.media}/>
+            <MediaGrid host={host} media={post.media}/>
 
             {/* Likes, Comments, Shares */}
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mt={2} mb={1}>
                 <Typography variant="body2">
                     {post.likes.length} Likes
                 </Typography>
@@ -194,10 +194,10 @@ const PostWidget = ({post}) => {
             {/* Comments Section */}
             <NewCommentWidget theme={theme} handleCommentSubmit={handleCommentSubmit}/>
             <Box mt={1}>
-                {comments.map((comment) => (
-                    <CommentWidget handleCommentDelete={handleCommentDelete} key={comment._id} comment={comment}/>
-
-
+                {comments.map((comment, index) => (
+                    <Box key={index} sx={{mt: 2}}>
+                        < CommentWidget handleCommentDelete={handleCommentDelete} key={comment._id} comment={comment}/>
+                    </Box>
                 ))}
             </Box>
         </WidgetWrapper>

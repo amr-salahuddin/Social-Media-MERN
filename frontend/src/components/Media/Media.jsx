@@ -6,26 +6,23 @@ import {Box} from "@mui/material";
 
 const Media = (props) => {
 
-    const {file} = props;
+    const {file, host} = props;
     let {path, originalname, mimetype} = file;
-    path = `${process.env.REACT_APP_BACKEND_BASE}/${path}`
+    if (host)
+        path = `${host}/${path}`
     const fileType = mimetype.split('/')[0];
-    if(fileType == 'image') {
+    if (fileType == 'image') {
         return (
-            <Box  {...props} >
-            <Image   src={path} alt={originalname}/>
-            </Box>
+            <Image  {...props} src={path} alt={originalname}/>
         )
 
-    }
-    else if(fileType == 'video'){
-        return(
+    } else if (fileType == 'video') {
+        return (
             <Video {...props} src={path} alt={originalname}/>
         )
-    }
-    else{
+    } else {
         return (
-            <Other src={path} alt ={originalname}/>
+            <Other src={path} alt={originalname}/>
         )
     }
 }

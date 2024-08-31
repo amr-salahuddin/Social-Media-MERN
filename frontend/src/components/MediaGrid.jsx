@@ -2,49 +2,20 @@ import {Box, IconButton, Modal, useTheme} from "@mui/material";
 import Media from "./Media/Media";
 import React, {useEffect, useState} from "react";
 import {ArrowCircleLeftOutlined, ArrowLeft, ArrowLeftOutlined, ArrowRight, Close} from "@mui/icons-material";
+import MediaViewerModal from "./MediaViewerModal";
 
 
-function MediaGridViewer({media, host}) {
-
-
+function MediaGrid({media, host}) {
 
 
     console.log(media);
     const displayedMedia = media.slice(0, 4);
     const totalMedia = media.length;
 
-    const [open, setOpen] = useState(false)
-    const [index, setIndex] = useState(0)
     const theme = useTheme();
     const primary = theme.palette.primary.main;
-
-
-
-
-    useEffect(() => {
-
-
-        if (!open) return
-
-        function handleKeyDown(e) {
-
-            if (e.key === 'ArrowRight') {
-
-                handleNext()
-            } else if (e.key === 'ArrowLeft') {
-                handlePrevious()
-            }
-        }
-
-        document.addEventListener('keydown', handleKeyDown)
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown)
-        }
-    }, [open, index])
-
-    function handleClose() {
-        setOpen(false)
-    }
+    const [open, setOpen] = useState(false)
+    const [index, setIndex] = useState(0)
 
     function handleOpen(index) {
         setOpen(true)
@@ -64,9 +35,10 @@ function MediaGridViewer({media, host}) {
             setIndex((prev) => prev + 1)
         }
     }
+    function handleClose() {
+        setOpen(false)
+    }
 
-    const displayArrowRight = index < totalMedia - 1 ? 'visible' : 'hidden';
-    const displayArrowLeft = index === 0 ? 'hidden' : 'visible'
     return (
         <Box>
             <Box
@@ -85,7 +57,7 @@ function MediaGridViewer({media, host}) {
                             sx={{
                                 position: 'relative',
                                 overflow: 'hidden',
-                                    display: 'flex', // Make the box a flexbox container
+                                display: 'flex', // Make the box a flexbox container
                                 alignItems: 'center', // Vertically center
                                 justifyContent: 'center', // Horizontally center
 
@@ -125,59 +97,10 @@ function MediaGridViewer({media, host}) {
                         </Box>
                     );
                 })}
-
-                <Modal open={open} onClose={handleClose}
-                       sx={{
-                           userSelect: 'none',
-                           display: 'flex',
-                           alignItems: 'center',
-                           justifyContent: 'center',
-                           '& .MuiBackdrop-root': {backdropFilter: 'blur(4px)', backgroundColor: 'rgba(0, 0, 0, 0.95)'},
-                       }}>
-                    <Box sx={{
-                        width: '80%',
-                        height: '80%',
-                        maxWidth: '900px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        outline: 'none',  // Prevents the focus outline
-
-                    }}>
-
-                        <IconButton sx={{position: 'absolute', top: 0, left: 0}} onClick={handleClose}>
-                            {/*make color red*/}
-                            <Close color='error'/>
-
-                        </IconButton>
-
-
-                        <IconButton sx={{height: '100%', visibility: `${displayArrowLeft}`}}
-                                    onClick={() => setIndex(index - 1)}>
-                            <ArrowLeft color='primary' sx={{fontSize: 48}}/>
-
-                        </IconButton>
-
-                        <Box sx={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            background: 'rgba(0, 0, 0, 0.5)',
-                        }}>
-                            <Media host={host} sx={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'}}
-                                   file={media[index]}/>
-                        </Box>
-                        <IconButton onClick={() => setIndex(index + 1)}
-                                    sx={{height: '100%', visibility: `${displayArrowRight}`}}>
-                            <ArrowRight color='primary' sx={{fontSize: 48}}/>
-                        </IconButton>
-                    </Box>
-                </Modal>
             </Box>
+            <MediaViewerModal host={host} open={open} handleClose={handleClose} media={media} totalMedia={totalMedia}  handleNext={handleNext} handlePrevious={handlePrevious} index={index}/>
         </Box>
     )
 }
 
-export default MediaGridViewer
+export default MediaGrid

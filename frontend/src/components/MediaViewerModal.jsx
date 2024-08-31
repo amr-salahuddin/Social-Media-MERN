@@ -4,7 +4,7 @@ import Media from "./Media/Media";
 import React, {useEffect, useState} from "react";
 
 
-function MediaViewer({index}) {
+function MediaViewerModal({index,handleNext,handleClose,handlePrevious,open,totalMedia,media,host}) {
 
 
     useEffect(() => {
@@ -28,24 +28,11 @@ function MediaViewer({index}) {
         }
     }, [open, index])
 
-    function handleClose() {
-        setOpen(false)
-    }
 
 
 
-    function handlePrevious() {
 
-        if (index > 0) {
-            setIndex((prev) => prev - 1)
-        }
-    }
 
-    function handleNext() {
-        if (index < totalMedia - 1) {
-            setIndex((prev) => prev + 1)
-        }
-    }
 
 
     const displayArrowRight = index < totalMedia - 1 ? 'visible' : 'hidden';
@@ -78,7 +65,7 @@ function MediaViewer({index}) {
 
 
                 <IconButton sx={{height: '100%', visibility: `${displayArrowLeft}`}}
-                            onClick={() => setIndex(index - 1)}>
+                            onClick={handlePrevious}>
                     <ArrowLeft color='primary' sx={{fontSize: 48}}/>
 
                 </IconButton>
@@ -94,7 +81,7 @@ function MediaViewer({index}) {
                     <Media host={host} sx={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'}}
                            file={media[index]}/>
                 </Box>
-                <IconButton onClick={() => setIndex(index + 1)}
+                <IconButton onClick={handleNext}
                             sx={{height: '100%', visibility: `${displayArrowRight}`}}>
                     <ArrowRight color='primary' sx={{fontSize: 48}}/>
                 </IconButton>
@@ -102,4 +89,4 @@ function MediaViewer({index}) {
         </Modal>
     )
 }
-export default MediaViewer
+export default MediaViewerModal
