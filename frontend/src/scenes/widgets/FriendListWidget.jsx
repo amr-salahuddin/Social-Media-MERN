@@ -1,26 +1,22 @@
 import React, {useEffect, useState} from 'react';
-import { Box, Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText, IconButton, Divider } from '@mui/material';
-import { Delete } from '@mui/icons-material';
-import { WidgetWrapper } from '../../components/WidgetWrapper';
-import {useSelector} from "react-redux"; // Assuming WidgetWrapper is in the same directory
+import {Divider, List, Typography} from '@mui/material';
+import {WidgetWrapper} from '../../components/WidgetWrapper';
+import {useDispatch, useSelector} from "react-redux";
+import {getFriendsAPI} from "../../apiRequests";
+import FriendWidget from "./FriendWidget";
+import {setFriends} from "../../state"; // Assuming WidgetWrapper is in the same directory
 
-const FriendList = ( handleUnfriend) => {
+const FriendList = () => {
 
     const id = useSelector((state) => state.user._id);
-    const [friends, setFriends] = useState(null)
 
+    const dispatch = useDispatch();
+    let friends = useSelector((state) => state.user.friends);
     const getFriends = async () => {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND}/user/friends/${id}`, {
-            method: 'GET',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-            }
-            
-        })
-
-        if(response.ok){
-            const data = await response.json();
-            setFriends(data.data.friends);
+        const {ok, friendsData} = await getFriendsAPI(id);
+        if(ok){
+            dispatch(setFriends({ friends: friendsData}));
+            console.log(friendsData,friends)
         }
     }
     useEffect(() => {
@@ -39,63 +35,15 @@ const FriendList = ( handleUnfriend) => {
 
             {/* Friend List */}
             <List>
-                {friends.map((friend, index) => (
-                    <Box key={friend._id}>
-                        <ListItem alignItems="center">
-                            {/* Avatar */}
-                            <ListItemAvatar>
-                                <Avatar src={friend.avatarUrl} alt={friend.name} />
-                            </ListItemAvatar>
-                            {/* Name and Occupation */}
-                            <ListItemText
-                                primary={friend.firstName + ' ' + friend.lastName}
-                                secondary={friend.occupation}
-                            />
-                            {/* Unfriend Button */}
-                            <IconButton
-                                edge="end"
-                                aria-label="unfriend"
-                                onClick={() => handleUnfriend(friend.id)}
-                            >
-                                <Delete />
-                            </IconButton>
-                        </ListItem>
-                        {/* Divider between friends, except after the last one */}
-                        {index < friends.length - 1 && <Divider variant="inset" component="li" />}
-                    </Box>
+                {friends.map((friend,index) => (
+                    <React.Fragment key={friend._id}>
+                        <FriendWidget friend={friend}/>
+                        {index < friends.length - 1 && <Divider variant="inset" component="li"/>}
+                    </React.Fragment>
                 ))}
             </List>
         </WidgetWrapper>
     );
 };
 
-// Example usage with dummy data
-const friendsExample = [
-    {
-        id: 1,
-        name: 'John Doe',
-        avatarUrl: 'https://via.placeholder.com/50', // Replace with actual avatar URL
-        occupation: 'Software Engineer',
-    },
-    {
-        id: 2,
-        name: 'Jane Smith',
-        avatarUrl: 'https://via.placeholder.com/50', // Replace with actual avatar URL
-        occupation: 'Graphic Designer',
-    },
-    {
-        id: 3,
-        name: 'Bob Johnson',
-        avatarUrl: 'https://via.placeholder.com/50', // Replace with actual avatar URL
-        occupation: 'Product Manager',
-    },
-];
-
-// Example handleUnfriend function
-const handleUnfriend = (friendId) => {
-    console.log(`Unfriended friend with ID: ${friendId}`);
-};
-
-const FriendListExample = () => <FriendList friends={friendsExample} handleUnfriend={handleUnfriend} />;
-
-export default FriendListExample;
+export default FriendList;

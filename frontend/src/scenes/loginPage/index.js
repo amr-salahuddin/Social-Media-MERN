@@ -61,7 +61,7 @@ const LoginPage = () => {
                     )}
                 </IconButton>
             </FlexBetween>
-            <FormContainer>
+            <FormContainer sx={{mt:3}}>
                 {isRegister ? (<Register handleSwitch={handleSwitch}/>) : (<Login handleSwitch={handleSwitch}/>)}
             </FormContainer>
         </>

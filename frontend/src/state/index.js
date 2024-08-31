@@ -5,6 +5,7 @@ const initialState = {
     user: null,
     token: null,
     posts: [],
+    friends: []
 };
 
 export const authSlice = createSlice({
@@ -29,16 +30,21 @@ export const authSlice = createSlice({
                 console.error("user friends non-existent :(");
             }
         },
+        removeFriend: (state, action) => {
+            state.user.friends = state.user.friends.filter(
+                (friend) => friend._id !== action.payload.friendId
+            );
+        },
         setPosts: (state, action) => {
             state.posts = action.payload.posts;
         },
         addPost: (state, action) => {
             console.log(action.payload.post)
-            const updatedPosts = [ action.payload.post,...state.posts];
+            const updatedPosts = [action.payload.post, ...state.posts];
             state.posts = updatedPosts
-            console.log('ind',state.posts);
+            console.log('ind', state.posts);
         },
-        setPost: (state, action) => {
+        updatePost: (state, action) => {
             const updatedPosts = state.posts.map((post) => {
                 if (post._id === action.payload.post._id) return action.payload.post;
                 return post;
@@ -55,6 +61,6 @@ export const authSlice = createSlice({
     },
 });
 
-export const {setMode, setLogin, setLogout, setFriends, setPosts, addPost, setPost, deletePost} =
+export const {setMode, setLogin, setLogout, setFriends, removeFriend, setPosts, addPost, updatePost, deletePost} =
     authSlice.actions;
 export default authSlice.reducer;

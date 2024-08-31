@@ -12,7 +12,6 @@ const PostsWidget = () => {
     const id = useSelector((state) => state.user._id)
 
 
-    console.log(process.env.REACT_APP_BACKEND)
     const getPosts = async () => {
         const response = await fetch(`${process.env.REACT_APP_BACKEND}/user/posts/${id}`, {
             method: 'GET',
@@ -25,7 +24,6 @@ const PostsWidget = () => {
             const data = await response.json();
 
             dispatch(setPosts({posts: data.data.posts}));
-            console.log(posts);
         }
         else{
             console.log(response)
@@ -36,7 +34,6 @@ const PostsWidget = () => {
         getPosts();
     },[])
     if(!posts) return null;
-    console.log(posts);
     return (
         <Box>
             {posts.map((post) => (

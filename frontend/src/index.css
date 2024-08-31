@@ -6,6 +6,6 @@ html,body,#root,.app {
     box-sizing: border-box;
     font-family: 'Rubik', sans-serif;
 }
-/*html {*/
-/*    zoom: 75%;*/
-/*}*/
+html {
+    zoom: 90%;
+}

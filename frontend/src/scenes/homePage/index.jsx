@@ -38,16 +38,15 @@ const samplePosts = [
 
 const HomePage = () => {
     return (<>
-
             <Navbar/>
-            <Box width='100%'padding='2rem 6%'   gap='1rem'  display="flex" justifyContent="space-between"
+            <Box width='100%'padding='1rem 3%'   gap='1rem'  display="flex" justifyContent="space-between"
             >
                 <Box flexBasis={'25%'}>
                     <ProfileWidget />
                 </Box>
-                <Box display='flex' flexDirection='column' gap='1.5rem' flexBasis={'35%'}>
-                    <NewPostWidget />
-                    <PostsWidget posts={samplePosts}/>
+                <Box display='flex' flexDirection='column' gap='1.5rem' flexBasis={'40%'}>
+                    <NewPostWidget/>
+                    <PostsWidget/>
                 </Box>
                 <Box display='flex' flexDirection='column' gap='1.5rem' flexBasis={'26%'}>
                     <AdWidget />
@@ -56,7 +55,6 @@ const HomePage = () => {
                 </Box>
             </Box>
         </>
-
     )
 }
 

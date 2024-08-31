@@ -1,28 +1,34 @@
-import React, {useState} from 'react';
-import {Box, Avatar, TextField, Button, Typography, Divider, useTheme} from '@mui/material';
-import {Image, VideoLibrary, AttachFile, Audiotrack} from '@mui/icons-material';
+import React, {useRef, useState} from 'react';
+import {Avatar, Box, Button, Divider, TextField, Typography, useTheme} from '@mui/material';
+import {AttachFile} from '@mui/icons-material';
 import {WidgetWrapper} from "../../components/WidgetWrapper";
-import {FlexBetween} from "../../components/FlexBetween";
 import {useDispatch, useSelector} from "react-redux";
 import {addPost} from "../../state";
+import FileUploader from "../../components/FileUploader";
+
 const MediaPostWidget = () => {
     const theme = useTheme();
 
+    const fileUploadRef = useRef()
     const [showFile, setShowFile] = useState()
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [files, setFiles] = useState(null);
     const [description, setDescription] = useState()
     function handleImageUpload(event) {
         const file = event.target.files[0];
-        console.log(file, URL.createObjectURL(file));
+        console.log('blob',file, URL.createObjectURL(file));
         setShowFile(URL.createObjectURL(file));
-        setSelectedFile(file);
+        console.log('hi',event.target.files);
+        setFiles(event.target.files);
     }
     const token = useSelector((state) => state.token);
     const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
     const sendPost = async () => {
         const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append('description', description);
+        console.log(files)
+        for (let i = 0; i < files.length; i++) {
+            formData.append('file', files[i]); // Adjust 'file' key if multer expects something else
+        }        formData.append('description', description);
 
         const response = await fetch(`${process.env.REACT_APP_BACKEND}/post`, {
             method: 'POST',
@@ -34,9 +40,9 @@ const MediaPostWidget = () => {
 
         if (response.ok) {
             const data = await response.json();
-            dispatch(addPost({post: data.data.post}));
-
-            console.log(data.data.post)
+            const post = data.data.post;
+            post.user = user;
+            dispatch(addPost({post}));
 
 
         } else {
@@ -47,21 +53,17 @@ const MediaPostWidget = () => {
 
     const handleSubmit = (event) => {
         sendPost()
-        setSelectedFile(null);
-        setShowFile(null);
+        handleFilesCancel()
         setDescription(null);
+    }
+    const handleFilesCancel = () => {
+        setFiles(null);
+        setShowFile(null);
     }
 
     return (
         <WidgetWrapper>
-            <input
-                type="file"
-                accept="*"
-                id="image-upload"
-
-                style={{display: 'none', position: 'absolute'}}
-                onChange={handleImageUpload}
-            />
+            <FileUploader fileUploadRef={fileUploadRef} fileUploadHandler={handleImageUpload}/>
             {/* Avatar and Search Bar */}
             <Box display="flex" alignItems="center" mb={2}>
                 <Avatar sx={{width: 56, height: 56, mr: 2}}/>
@@ -97,19 +99,21 @@ const MediaPostWidget = () => {
                         },
                     }}
                 />
-                {/* Display Selected Image */}
+                {/* Display Selected File */}
 
             </Box>
             <Divider sx={{mb: 2}}/>
             {showFile && (
                 <Box mt={2}>
-                    <Typography variant="body2" mb={1}>Selected Image:</Typography>
+                    <Typography variant="body2" mb={1}>Selected File:</Typography>
+                    <Button onClick={handleFilesCancel}>Remove</Button>
                     <Box
                         component="img"
                         src={showFile}
                         alt="Selected"
                         width="100%"
                         height="auto"
+                        maxHeight='300px'
                         sx={{borderRadius: '0.75rem'}}
                     />
                 </Box>
@@ -119,7 +123,7 @@ const MediaPostWidget = () => {
             <Box display='flex' justifyContent='end' mb='1rem'>
 
                 <Button startIcon={<AttachFile/>} onClick={() => {
-                    document.querySelector('#image-upload').click()
+                    fileUploadRef.current.click()
                 }} sx={{mx: 1}}>Attachment</Button>
 
                 <Button onClick={handleSubmit} variant="contained" color="primary">

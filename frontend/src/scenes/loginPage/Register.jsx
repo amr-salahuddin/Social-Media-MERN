@@ -1,9 +1,9 @@
-import { Box, Button, Grid, Link, TextField, Typography } from "@mui/material";
-import { useTheme } from '@emotion/react';
-import React, { useState } from "react";
-import { FlexBetween } from "../../components/FlexBetween";
+import {Box, Button, Grid, Link, TextField, Typography} from "@mui/material";
+import {useTheme} from '@emotion/react';
+import React, {useState} from "react";
+import {FlexBetween} from "../../components/FlexBetween";
 import Dropzone from "react-dropzone";
-import { useFormik } from 'formik';
+import {useFormik} from 'formik';
 import * as Yup from 'yup';
 
 const Register = (props) => {
@@ -17,45 +17,45 @@ const Register = (props) => {
 
     const theme = useTheme();
     const handleSwitch = props.handleSwitch;
+
     async function handleSubmit(values) {
-        const formData ={
+        const formData = {
             firstName: values.firstName,
             lastName: values.lastName,
             username: values.username,
             email: values.email,
             password: values.password,
-            passwordConfirm: values.passwordConfirm
+            passwordConfirm: values.passwordConfirm,
         }
-
-        //output formdata values
+        console.log(formData.passwordConfirm, values.passwordConfirm)
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND}/auth/register`, {
                 method: 'POST',
                 body: JSON.stringify(formData),
                 headers: {
-                    'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json'
                 }
             });
-            if(response.ok){
+            if (response.ok) {
+                console.log(response.ok,response)
                 const data = await response.json();
-                handleSwitch();
+                // handleSwitch();
                 console.log(data)
-            }
-            else{
+            } else {
                 console.log('error', response);
             }
 
-        }catch (e){
+        } catch (e) {
             console.log(e)
         }
 
     }
+
     const formik = useFormik({
         initialValues: {
             firstName: '',
             lastName: '',
-            username:'',
+            username: '',
             email: '',
             password: '',
             passwordConfirm: '',
@@ -75,12 +75,12 @@ const Register = (props) => {
     });
 
     return (
-        <Box component="form" noValidate width='70%' sx={{ mt: 1,mb:5 }} onSubmit={formik.handleSubmit}>
+        <Box component="form" noValidate width='70%' sx={{ mb: 5}} onSubmit={formik.handleSubmit}>
             <FlexBetween display='flex' justifyContent='center' gap='1rem'>
                 <TextField
                     margin="normal"
                     required
-                    sx={{ flex: 1 }}
+                    sx={{flex: 1}}
                     label="First Name"
                     autoFocus
                     name="firstName"
@@ -94,7 +94,7 @@ const Register = (props) => {
                 <TextField
                     margin="normal"
                     required
-                    sx={{ flex: 1 }}
+                    sx={{flex: 1}}
                     label="Last Name"
                     name="lastName"
                     value={formik.values.lastName}
@@ -132,55 +132,37 @@ const Register = (props) => {
                 error={formik.touched.username && Boolean(formik.errors.username)}
                 helperText={formik.touched.username && formik.errors.username}
             />
-            <TextField
-                margin="normal"
-                required
-                fullWidth
-                label="Password"
-                name="password"
-                type="password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.password && Boolean(formik.errors.password)}
-                helperText={formik.touched.password && formik.errors.password}
-            />
-            <TextField
-                margin="normal"
-                required
-                fullWidth
-                label="Password Confirmation"
-                name="passwordConfirm"
-                type="password"
-                value={formik.values.passwordConfirm}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.passwordConfirm && Boolean(formik.errors.password)}
-                helperText={formik.touched.passwordConfirm && formik.errors.passwordConfirm}
-            />
-            <Box p='1rem' border='1px solid grey'>
-                <Dropzone onDrop={handleDrop}>
-                    {({ getRootProps, getInputProps, isDragActive }) => (
-                        <Box {...getRootProps()}
-                             sx={{ border: `2px dashed ${theme.palette.primary.main}`, p: '1rem', '&:hover': { cursor: 'pointer' }, }}>
-                            <input {...getInputProps()} />
-                            {!selectedFile && (
-                                isDragActive ? (
-                                    <Typography>Drop the files here ...</Typography>
-                                ) : (
-                                    <Typography>Drag 'n' drop a picture here, or click to select a file</Typography>
-                                )
-                            )}
-                            {selectedFile && (
-                                <Typography variant="body2">
-                                    {selectedFile.name}
-                                </Typography>
-                            )}
-                        </Box>
-                    )}
-                </Dropzone>
-            </Box>
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+            <FlexBetween display='flex' justifyContent='center' gap='1rem'>
+
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    label="Password"
+                    name="password"
+                    type="password"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.password && Boolean(formik.errors.password)}
+                    helperText={formik.touched.password && formik.errors.password}
+                />
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    label="Password Confirmation"
+                    name="passwordConfirm"
+                    type="password"
+                    value={formik.values.passwordConfirm}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.passwordConfirm && Boolean(formik.errors.password)}
+                    helperText={formik.touched.passwordConfirm && formik.errors.passwordConfirm}
+                />
+            </FlexBetween>
+
+            <Button type="submit" fullWidth variant="contained" sx={{mt: 3, mb: 2}}>
                 Register
             </Button>
             <Grid container justifyContent="flex-end">
