@@ -2,9 +2,15 @@ const mongoose = require("mongoose");
 
 const likeSchema = new mongoose.Schema({
     type: {
-        type: String,
+        type: Number,
+        required: true
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true
     }
+
 })
 
 
@@ -25,6 +31,10 @@ const postSchema = new mongoose.Schema({
     updatedAt: {
         type: Date
     },
+    postNumber:{
+        type: Number,
+        default:0
+    },
     media: {
         type: Array,
         default: [],
@@ -34,8 +44,8 @@ const postSchema = new mongoose.Schema({
         default: false
     },
     likes: {
-        type: Map,
-        of: likeSchema
+        type: Array,
+        default: []
     },
     likesCount: {
         type: Map,

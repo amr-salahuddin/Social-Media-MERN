@@ -1,4 +1,5 @@
 const authController = require("../controllers/auth-controller");
+const {profilePictureStorage} = require("../utils/multerConfig");
 const router = require("express").Router();
 router.post('/register', authController.register);
 router.post('/login', authController.login);

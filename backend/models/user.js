@@ -22,12 +22,16 @@ const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        index: true,
+
     },
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        index: true,
+
     },
     password: {
         type: String,
@@ -92,6 +96,14 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Post"
     }],
+    postNumber:{
+        type: Number,
+        default:0
+    },
+    likedPosts: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post"
+    }],
     comments: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Comment"
@@ -108,7 +120,7 @@ const userSchema = new mongoose.Schema({
 
 })
 
-
+userSchema.indexes({email: 1, username: 1}, {unique: true});
 //pre save
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();

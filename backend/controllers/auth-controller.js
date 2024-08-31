@@ -7,6 +7,7 @@ const {tokenize} = require("../utils/tokenization");
 
 exports.register = catchAsync(async (req, res, next) => {
 
+    const file = req.file;
     const userData = {
         firstName,
         lastName,
@@ -17,10 +18,11 @@ exports.register = catchAsync(async (req, res, next) => {
         location,
         occupation
     } = req.body;
-    const {user, token} = await userService.register(userData);
     if (password !== passwordConfirm) {
         return next(new AppError('Passwords do not match', 400))
     }
+    const {user, token} = await userService.register(userData);
+    //copy file to user folder
     res.status(200).json({
         success: true,
         data: {user, token}

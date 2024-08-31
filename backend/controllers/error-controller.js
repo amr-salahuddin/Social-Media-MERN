@@ -2,6 +2,7 @@ const AppError = require("../utils/appError");
 
 
 function sendErrorDev(err, res) {
+    console.log('err')
     res.json({
         status: err.status,
         mzzzzessage: err.message,

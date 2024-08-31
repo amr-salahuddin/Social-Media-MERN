@@ -3,9 +3,8 @@ const mongoose = require("mongoose");
 const commentSchema = new mongoose.Schema({
     comment: {
         type: String,
-        required: true
     },
-    mediaUrl:{
+    media:{
         type:Array,
         default: []
     },
@@ -17,27 +16,15 @@ const commentSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    firstName:{
-        type: String,
-        required: true
-    },
-    lastName:{
-        type: String,
-        required: true
-    },
-    avatar:{
-        type: String,
-        required: true
-    },
-    userId:{
+    user:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
-    postId:{
+
+    post:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Post"
     },
-
     reportsReceived:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Report"

@@ -29,6 +29,7 @@ exports.register = async (user) => {
 
     const token = tokenize({id: newUser._id});
 
+    console.log('done')
     return {user: newUser, token};
 }
 

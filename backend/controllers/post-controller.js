@@ -48,3 +48,47 @@ exports.deletePost = catchAsync(async (req, res, next) => {
         data: {post}
     })
 })
+
+exports.likePost= catchAsync(async (req, res, next) => {
+    const postId = req.params.id;
+    const {type} = req.body;
+    console.log(type)
+    const user = req.user;
+
+    const post = await postService.likePost(user, postId,type);
+    res.status(200).json({
+        success: true,
+        data: {post}
+    })
+})
+
+exports.comment = catchAsync(async (req, res, next) => {
+    const postId = req.params.id;
+    const {comment} = req.body;
+    const files = req.files
+    const user = req.user;
+    const newComment = await postService.comment(user, postId,comment,files);
+    res.status(200).json({
+        success: true,
+        data: {comment:newComment}
+    })
+})
+
+exports.uncomment = catchAsync(async (req, res, next) => {
+    const postId = req.params.id;
+    const user = req.user;
+    const post = await postService.uncomment(user, postId);
+    res.status(200).json({
+        success: true,
+        data: {post}
+    })
+})
+
+exports.getComments = catchAsync(async (req, res, next) => {
+    const postId = req.params.id;
+    const comments = await postService.getComments(postId);
+    res.status(200).json({
+        success: true,
+        data: {comments}
+    })
+})
