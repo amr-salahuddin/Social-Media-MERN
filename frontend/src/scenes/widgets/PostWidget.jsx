@@ -195,7 +195,7 @@ const PostWidget = ({post}) => {
             <NewCommentWidget theme={theme} handleCommentSubmit={handleCommentSubmit}/>
             <Box mt={1}>
                 {comments.map((comment, index) => (
-                    <Box key={index} sx={{mt: 2}}>
+                    <Box key={index} sx={{mt: 1,mb:6}}>
                         < CommentWidget handleCommentDelete={handleCommentDelete} key={comment._id} comment={comment}/>
                     </Box>
                 ))}

@@ -7,7 +7,7 @@ import {addPost} from "../../state";
 import FileUploader from "../../components/FileUploader";
 import MediaGrid from "../../components/MediaGrid";
 
-const MediaPostWidget = () => {
+const NewPostWidget = () => {
     const theme = useTheme();
 
     const fileUploadRef = useRef()
@@ -146,4 +146,4 @@ const MediaPostWidget = () => {
     );
 }
 
-export default MediaPostWidget;
+export default NewPostWidget;

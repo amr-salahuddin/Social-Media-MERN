@@ -60,6 +60,14 @@ function Comment({comment, handleCommentDelete, handleCommentEdit}) {
                 {comment.comment}
             </Typography>
             <MediaGrid media={comment.media} host={host}/>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} mb={1}>
+                <Typography variant="body2">
+                   0 Likes
+                </Typography>
+                <Typography variant="body2">
+                   0 Replies 
+                </Typography>
+            </Box>
         </React.Fragment>
     )
 }

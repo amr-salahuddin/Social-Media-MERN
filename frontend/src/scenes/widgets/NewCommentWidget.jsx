@@ -2,25 +2,48 @@ import {Box, IconButton, InputAdornment, TextField} from "@mui/material";
 import {Attachment, Send} from "@mui/icons-material";
 import React, {useRef, useState} from "react";
 import FileUploader from "../../components/FileUploader";
+import MediaGrid from "components/MediaGrid";
 
 function NewCommentWidget({theme,handleCommentSubmit}) {
     const [comment, setComment] = useState('');
     const [files, setFiles] = useState(null)
-    const [showFile, setShowFile] = useState(null)
+    const [showFiles, setShowFiles] = useState(null)
     const fileUploadRef = useRef();
     function handleSubmit(e) {
         handleCommentSubmit(comment,files);
+        setShowFiles(null);
+        setFiles(null)
     }
+
+
     async function handleOnChange(e) {
 
         setComment(e.target.value);
         console.log(e.target.value, comment)
     }
-    function handleFileUpload(e) {
-        const blobFile = URL.createObjectURL(e.target.files[0])
-        setShowFile(blobFile)
-        setFiles(e.target.files)
+    function handleFileUpload(event) {
+        const tempShowFiles = [];
+        for (let i = 0; i < event.target.files.length; i++) {
+
+            const file = event.target.files[i];
+
+            console.log(file, 'sxs')
+            const path = URL.createObjectURL(file)
+            tempShowFiles.push(
+                {
+                    path,
+                    originalname: file.name,
+                    mimetype: file.type
+                }
+            );
+
+        }
+
+        setShowFiles(tempShowFiles);
+        console.log('xx', tempShowFiles, showFiles)
+        setFiles(event.target.files);
     }
+
     return (
         <><Box>
             <TextField
@@ -69,15 +92,7 @@ function NewCommentWidget({theme,handleCommentSubmit}) {
                 }}
             />
         </Box>
-            <Box
-                component="img"
-
-            >
-
-            </Box
-
-
-            >
+         {showFiles && <MediaGrid media={showFiles}/>}
         </>
     )
 }

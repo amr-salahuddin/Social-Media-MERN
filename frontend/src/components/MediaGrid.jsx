@@ -7,12 +7,14 @@ import MediaViewerModal from "./MediaViewerModal";
 
 function MediaGrid({media, host}) {
 
+    
+    const theme = useTheme();
 
-    console.log(media);
+
+    console.log('mg',media);
     const displayedMedia = media.slice(0, 4);
     const totalMedia = media.length;
 
-    const theme = useTheme();
     const primary = theme.palette.primary.main;
     const [open, setOpen] = useState(false)
     const [index, setIndex] = useState(0)
